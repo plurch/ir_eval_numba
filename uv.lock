@@ -1,0 +1,7 @@
+version = 1
+requires-python = ">=3.11, <3.13"
+
+[[package]]
+name = "ir-eval-numba"
+version = "0.1.0"
+source = { editable = "." }
