@@ -2,7 +2,7 @@ import math
 import numpy as np
 import numpy.typing as npt
 from numba import njit
-
+from numba.typed import List
 
 @njit(nogil=True, cache=True)
 def find_relevant_indices(actual: npt.NDArray, predicted: npt.NDArray, k: int) -> npt.NDArray:
@@ -118,6 +118,7 @@ def average_precision(actual: npt.NDArray, predicted: npt.NDArray, k: int) -> fl
   precision_array = np.array([precision(actual, predicted, i+1) for i in relevant_idxs])
   return mean_of_array(precision_array)
 
+@njit(nogil=True, cache=True)
 def mean_average_precision(actual_list: list[npt.NDArray], predicted_list: list[npt.NDArray], k: int) -> float:
   """
   Computes the Mean Average Precision (MAP) at a specified rank `k`.
@@ -144,6 +145,7 @@ def mean_average_precision(actual_list: list[npt.NDArray], predicted_list: list[
   ap_values = np.array([average_precision(actual_list[i], predicted_list[i], k) for i in range(len(actual_list))])
   return mean_of_array(ap_values) 
 
+@njit(nogil=True, cache=True)
 def ndcg(actual: npt.NDArray, predicted: npt.NDArray, k: int) -> float:
   """
   Computes the Normalized Discounted Cumulative Gain (nDCG) at a specified rank `k`.

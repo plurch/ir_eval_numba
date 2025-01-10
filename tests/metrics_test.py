@@ -1,5 +1,6 @@
 import pytest
 import numpy as np
+from numba.typed import List
 from ir_eval_numba.metrics import (
     recall,
     precision,
@@ -22,6 +23,9 @@ predicted = np.array([1, 2, 62, 84, 3, 4, 81, 14, 5, 67])
 # intersection: {3, 4, 14}
 
 class TestRecall:
+  def test_is_numba_func(self):
+    assert hasattr(recall, '__numba__')
+
   def test_recall_k_5(self):
     result = recall(actual, predicted, 5)
     assert result == pytest.approx(0.04) # 1 out of 25
@@ -31,6 +35,9 @@ class TestRecall:
     assert result == pytest.approx(0.12) # 3 out of 25
 
 class TestPrecision:
+  def test_is_numba_func(self):
+    assert hasattr(precision, '__numba__')
+
   def test_precision_k_5(self):
     result = precision(actual, predicted, 5)
     assert result == pytest.approx(0.2) # 1 out of 5
@@ -40,6 +47,9 @@ class TestPrecision:
     assert result == pytest.approx(0.3) # 3 out of 10
 
 class TestAveragePrecision:
+  def test_is_numba_func(self):
+    assert hasattr(average_precision, '__numba__')
+
   def test_average_precision_basic(self):
     # basic inputs
     result = average_precision(np.array([1,3,5]), np.array([1,2,3,4,5]), 5)
@@ -54,29 +64,44 @@ class TestAveragePrecision:
     assert result == pytest.approx(0.30277777777777776)
 
 class TestMeanAveragePrecision:
+  def test_is_numba_func(self):
+    assert hasattr(mean_average_precision, '__numba__')
+
   def test_mean_average_precision_basic(self):
     # basic inputs
-    actual_list = [
+    actual_list = List([
       np.array([1,3,5,10]),
       np.array([2,4,6,8]),
       np.array([7,8,9])
-    ]
+    ]) # type: ignore
 
-    predicted_list = [
+    predicted_list = List([
       np.array([1,2,3,4,5]),
       np.array([9,2,3,1,5]),
       np.array([4,5,9,8,3])
-    ]
+    ]) # type: ignore
     result = mean_average_precision(actual_list, predicted_list, 5)
     # ap values: [0.7555555555555555, 0.5, 0.41666666666666663]
     assert result == pytest.approx(0.5574074074074074)
 
   def test_mean_average_precision_pydoc(self):
     # example from pydoc string
-    actual_list = [np.array([1, 2, 3]), np.array([2, 3, 4])]
+    actual_list = List([np.array([1, 2, 3]), np.array([2, 3, 4])]) # type: ignore
 
-    predicted_list = [np.array([1, 4, 2, 3]), np.array([2, 3, 5, 4])]
+    predicted_list = List([np.array([1, 4, 2, 3]), np.array([2, 3, 5, 4])]) # type: ignore
     result = mean_average_precision(actual_list, predicted_list, 3)
     # ap values: [0.8333333333333333, 1.0]
     assert result == pytest.approx(0.9166666666666666)
+
+class TestNCDG:
+  def test_is_numba_func(self):
+    assert hasattr(ndcg, '__numba__')
+
+  def test_ndcg_k_5(self):
+    result = ndcg(actual, predicted, 5)
+    assert result == pytest.approx(0.13120507751234178)
+  
+  def test_ndcg_k_10(self):
+    result = ndcg(actual, predicted, 10)
+    assert result == pytest.approx(0.23297260855707355)
 
