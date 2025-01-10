@@ -204,6 +204,7 @@ def reciprocal_rank(actual: npt.NDArray, predicted: npt.NDArray, k: int) -> floa
   
   return float(0)
 
+@njit(nogil=True, cache=True)
 def mean_reciprocal_rank(actual_list: list[npt.NDArray], predicted_list: list[npt.NDArray], k: int) -> float:
   """
   Computes the Mean Reciprocal Rank (MRR) at a specified rank `k`.
@@ -227,5 +228,5 @@ def mean_reciprocal_rank(actual_list: list[npt.NDArray], predicted_list: list[np
 
   assert len(actual_list) == len(predicted_list)
 
-  rr_values = [reciprocal_rank(actual_list[i], predicted_list[i], k) for i in range(len(actual_list))]
+  rr_values = np.array([reciprocal_rank(actual_list[i], predicted_list[i], k) for i in range(len(actual_list))])
   return mean_of_array(rr_values)

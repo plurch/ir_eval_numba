@@ -117,3 +117,26 @@ class TestReciprocalRank:
     result = reciprocal_rank(np.array([1,2,3]), np.array([4,5,6,7,8]), 5)
     assert result == pytest.approx(0) # no relevant items found
 
+class TestMeanReciprocalRank:
+  def test_is_numba_func(self):
+    assert hasattr(mean_reciprocal_rank, '__numba__')
+
+  def test_mean_reciprocal_rank_basic(self):
+    # basic inputs
+    actual_list = List([
+      np.array([1,3,5]),
+      np.array([2,4,6]),
+      np.array([7,8,9]),
+      np.array([7,8,9])
+    ]) # type: ignore
+
+    predicted_list = List([
+      np.array([1,2,3,4,5]),
+      np.array([9,2,3,1,5]),
+      np.array([4,5,9,8,3]),
+      np.array([1,2,3,4,5])
+    ]) # type: ignore
+    result = mean_reciprocal_rank(actual_list, predicted_list, 5)
+    # rr values: [1.0, 0.5, 0.333, 0]
+    assert result == pytest.approx(0.4583333333333333)
+  
