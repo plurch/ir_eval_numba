@@ -39,3 +39,17 @@ class TestPrecision:
     result = precision(actual, predicted, 10)
     assert result == pytest.approx(0.3) # 3 out of 10
 
+class TestAveragePrecision:
+  def test_average_precision_basic(self):
+    # basic inputs
+    result = average_precision(np.array([1,3,5]), np.array([1,2,3,4,5]), 5)
+    assert result == pytest.approx(0.7555555555555555) # (1 + 0.67 + 0.6) / 3 = 0.75555
+
+  def test_precision_k_5(self):
+    result = average_precision(actual, predicted, 5)
+    assert result == pytest.approx(0.2)
+
+  def test_precision_k_10(self):
+    result = average_precision(actual, predicted, 10)
+    assert result == pytest.approx(0.30277777777777776)
+

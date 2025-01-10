@@ -3,8 +3,42 @@ import numpy as np
 import numpy.typing as npt
 from numba import njit
 
+
+@njit(nogil=True, cache=True)
+def find_relevant_indices(actual: npt.NDArray, predicted: npt.NDArray, k: int) -> npt.NDArray:
+  """
+  Find indices of top-k predictions that are relevant items
+
+  numba does not support np.isin(), so use this implementation
+
+  Args:
+    actual (npt.NDArray): An array of ground truth relevant items.
+    predicted (npt.NDArray): An array of predicted items, ordered by relevance.
+    k (int): The number of top predictions to consider.
+
+  Returns:
+    npt.NDArray: The mean of all values in the array
+  """
+  actual_set = set(actual)
+  idxs = []
+
+  for i in range(k):
+    if predicted[i] in actual_set:
+      idxs.append(i)
+
+  return np.array(idxs)
+
 @njit(nogil=True, cache=True)
 def mean_of_array(l: npt.NDArray) -> float:
+  """
+  Calculate the mean of all values in an array
+
+  Args:
+    l (npt.NDArray): An array of float values
+
+  Returns:
+    float: The mean of all values in the array
+  """
   return sum(l) / len(l)
 
 @njit(nogil=True, cache=True)
@@ -62,6 +96,7 @@ def precision(actual: npt.NDArray, predicted: npt.NDArray, k: int) -> float:
   count_relevant_in_top_k = len(actual_set.intersection(top_k_predictions))
   return count_relevant_in_top_k / float(k)
 
+@njit(nogil=True, cache=True)
 def average_precision(actual: npt.NDArray, predicted: npt.NDArray, k: int) -> float:
   """
   Computes the Average Precision (AP) at a specified rank `k`.
@@ -79,9 +114,9 @@ def average_precision(actual: npt.NDArray, predicted: npt.NDArray, k: int) -> fl
       float: The Average Precision score. If no relevant items are retrieved within the
       top `k` predictions, the function may raise a division by zero error or return `NaN`.
   """
-  actual_set = set(actual)
-  precision_list = [precision(actual, predicted, i+1) for i in range(k) if predicted[i] in actual_set]
-  return mean_of_array(precision_list)
+  relevant_idxs = find_relevant_indices(actual, predicted, k)
+  precision_array = np.array([precision(actual, predicted, i+1) for i in relevant_idxs])
+  return mean_of_array(precision_array)
 
 def mean_average_precision(actual_list: list[npt.NDArray], predicted_list: list[npt.NDArray], k: int) -> float:
   """
