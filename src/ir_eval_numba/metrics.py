@@ -173,6 +173,7 @@ def ndcg(actual: npt.NDArray, predicted: npt.NDArray, k: int) -> float:
   idcg = sum([1.0/math.log2(i+2) for i in range(min(k, len(actual_set)))])
   return dcg / idcg
 
+@njit(nogil=True, cache=True)
 def reciprocal_rank(actual: npt.NDArray, predicted: npt.NDArray, k: int) -> float:
   """
   Computes the Reciprocal Rank (RR) at a specified rank `k`.

@@ -105,3 +105,15 @@ class TestNCDG:
     result = ndcg(actual, predicted, 10)
     assert result == pytest.approx(0.23297260855707355)
 
+class TestReciprocalRank:
+  def test_is_numba_func(self):
+    assert hasattr(reciprocal_rank, '__numba__')
+
+  def test_reciprocal_rank_k_10(self):
+    result = reciprocal_rank(actual, predicted, 10)
+    assert result == pytest.approx(0.2) # found at position 5
+  
+  def test_reciprocal_rank_zero(self):
+    result = reciprocal_rank(np.array([1,2,3]), np.array([4,5,6,7,8]), 5)
+    assert result == pytest.approx(0) # no relevant items found
+
