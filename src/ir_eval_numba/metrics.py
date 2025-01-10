@@ -139,10 +139,9 @@ def mean_average_precision(actual_list: list[npt.NDArray], predicted_list: list[
   Raises:
       AssertionError: If the lengths of `actual_list` and `predicted_list` are not equal.
   """
-
   assert len(actual_list) == len(predicted_list)
 
-  ap_values = [average_precision(actual_list[i], predicted_list[i], k) for i in range(len(actual_list))]
+  ap_values = np.array([average_precision(actual_list[i], predicted_list[i], k) for i in range(len(actual_list))])
   return mean_of_array(ap_values) 
 
 def ndcg(actual: npt.NDArray, predicted: npt.NDArray, k: int) -> float:
