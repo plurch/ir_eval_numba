@@ -21,11 +21,10 @@ wheels = [
 
 [[package]]
 name = "ir-eval-numba"
-version = "0.1.0"
+version = "1.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "numba" },
-    { name = "numpy" },
 ]
 
 [package.dev-dependencies]
@@ -34,10 +33,7 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [
-    { name = "numba", specifier = ">=0.60.0" },
-    { name = "numpy", specifier = ">=2.0.2" },
-]
+requires-dist = [{ name = "numba", specifier = ">=0.60.0" }]
 
 [package.metadata.requires-dev]
 dev = [{ name = "pytest", specifier = ">=8.3.4" }]
