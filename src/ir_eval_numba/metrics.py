@@ -2,22 +2,24 @@ import math
 import numpy as np
 import numpy.typing as npt
 from numba import njit
-from numba.typed import List
+from typing import TypeVar
+
+IntType = TypeVar('IntType', np.int8, np.int16, np.int32, np.int64, np.uint8, np.uint16, np.uint32, np.uint64)
 
 @njit(nogil=True, cache=True)
-def find_relevant_indices(actual: npt.NDArray, predicted: npt.NDArray, k: int) -> npt.NDArray:
+def find_relevant_indices(actual: npt.NDArray[IntType], predicted: npt.NDArray[IntType], k: int) -> npt.NDArray[IntType]:
   """
   Find indices of top-k predictions that are relevant items
 
   numba does not support np.isin(), so use this implementation
 
   Args:
-    actual (npt.NDArray): An array of ground truth relevant items.
-    predicted (npt.NDArray): An array of predicted items, ordered by relevance.
+    actual (npt.NDArray[IntType]): An array of ground truth relevant items.
+    predicted (npt.NDArray[IntType]): An array of predicted items, ordered by relevance.
     k (int): The number of top predictions to consider.
 
   Returns:
-    npt.NDArray: The mean of all values in the array
+    npt.NDArray[IntType]: The mean of all values in the array
   """
   actual_set = set(actual)
   idxs = []
@@ -29,12 +31,12 @@ def find_relevant_indices(actual: npt.NDArray, predicted: npt.NDArray, k: int) -
   return np.array(idxs)
 
 @njit(nogil=True, cache=True)
-def mean_of_array(l: npt.NDArray) -> float:
+def mean_of_array(l: npt.NDArray[IntType]) -> float:
   """
   Calculate the mean of all values in an array
 
   Args:
-    l (npt.NDArray): An array of float values
+    l (npt.NDArray[IntType]): An array of float values
 
   Returns:
     float: The mean of all values in the array
@@ -42,7 +44,7 @@ def mean_of_array(l: npt.NDArray) -> float:
   return sum(l) / len(l)
 
 @njit(nogil=True, cache=True)
-def recall(actual: npt.NDArray, predicted: npt.NDArray, k: int) -> float:
+def recall(actual: npt.NDArray[IntType], predicted: npt.NDArray[IntType], k: int) -> float:
   """
   Calculate the recall@k metric.
 
@@ -51,8 +53,8 @@ def recall(actual: npt.NDArray, predicted: npt.NDArray, k: int) -> float:
   Recall =  Total number of items retrieved that are relevant/Total number of relevant items in the database.
 
   Args:
-    actual (npt.NDArray): An array of ground truth relevant items.
-    predicted (npt.NDArray): An array of predicted items, ordered by relevance.
+    actual (npt.NDArray[IntType]): An array of ground truth relevant items.
+    predicted (npt.NDArray[IntType]): An array of predicted items, ordered by relevance.
     k (int): The number of top predictions to consider.
 
   Returns:
@@ -69,7 +71,7 @@ def recall(actual: npt.NDArray, predicted: npt.NDArray, k: int) -> float:
   return count_relevant_in_top_k / float(len(actual_set))
 
 @njit(nogil=True, cache=True)
-def precision(actual: npt.NDArray, predicted: npt.NDArray, k: int) -> float:
+def precision(actual: npt.NDArray[IntType], predicted: npt.NDArray[IntType], k: int) -> float:
   """
   Calculate the precision@k metric.
 
@@ -79,8 +81,8 @@ def precision(actual: npt.NDArray, predicted: npt.NDArray, k: int) -> float:
   Precision =  Total number of items retrieved that are relevant/Total number of items that are retrieved.
 
   Args:
-    actual (npt.NDArray): An array of ground truth relevant items.
-    predicted (npt.NDArray): An array of predicted items, ordered by relevance.
+    actual (npt.NDArray[IntType]): An array of ground truth relevant items.
+    predicted (npt.NDArray[IntType]): An array of predicted items, ordered by relevance.
     k (int): The number of top predictions to consider.
 
   Returns:
@@ -97,7 +99,7 @@ def precision(actual: npt.NDArray, predicted: npt.NDArray, k: int) -> float:
   return count_relevant_in_top_k / float(k)
 
 @njit(nogil=True, cache=True)
-def average_precision(actual: npt.NDArray, predicted: npt.NDArray, k: int) -> float:
+def average_precision(actual: npt.NDArray[IntType], predicted: npt.NDArray[IntType], k: int) -> float:
   """
   Computes the Average Precision (AP) at a specified rank `k`.
 
@@ -106,8 +108,8 @@ def average_precision(actual: npt.NDArray, predicted: npt.NDArray, k: int) -> fl
   each rank where a relevant item is retrieved within the top `k` predictions.
 
   Args:
-      actual (npt.NDArray): A list of integers representing the ground truth relevant items.
-      predicted (npt.NDArray): A list of integers representing the predicted rankings of items.
+      actual (npt.NDArray[IntType]): A list of integers representing the ground truth relevant items.
+      predicted (npt.NDArray[IntType]): A list of integers representing the predicted rankings of items.
       k (int): The maximum number of top-ranked items to consider for evaluation.
 
   Returns:
@@ -119,7 +121,7 @@ def average_precision(actual: npt.NDArray, predicted: npt.NDArray, k: int) -> fl
   return mean_of_array(precision_array)
 
 @njit(nogil=True, cache=True)
-def mean_average_precision(actual_list: list[npt.NDArray], predicted_list: list[npt.NDArray], k: int) -> float:
+def mean_average_precision(actual_list: list[npt.NDArray[IntType]], predicted_list: list[npt.NDArray[IntType]], k: int) -> float:
   """
   Computes the Mean Average Precision (MAP) at a specified rank `k`.
 
@@ -127,9 +129,9 @@ def mean_average_precision(actual_list: list[npt.NDArray], predicted_list: list[
   queries.
 
   Args:
-      actual_list (numba.typed.List[npt.NDArray]): A list of arrays where each inner list represents 
+      actual_list (numba.typed.List[npt.NDArray[IntType]]): A list of arrays where each inner list represents 
           the ground truth relevant items for a query
-      predicted_list (numba.typed.List[npt.NDArray]): A list of arrays where each inner list represents 
+      predicted_list (numba.typed.List[npt.NDArray[IntType]]): A list of arrays where each inner list represents 
           the predicted rankings of items for a query
       k (int): The maximum number of top-ranked items to consider for each prediction.
 
@@ -146,7 +148,7 @@ def mean_average_precision(actual_list: list[npt.NDArray], predicted_list: list[
   return mean_of_array(ap_values) 
 
 @njit(nogil=True, cache=True)
-def ndcg(actual: npt.NDArray, predicted: npt.NDArray, k: int) -> float:
+def ndcg(actual: npt.NDArray[IntType], predicted: npt.NDArray[IntType], k: int) -> float:
   """
   Computes the Normalized Discounted Cumulative Gain (nDCG) at a specified rank `k`.
 
@@ -155,8 +157,8 @@ def ndcg(actual: npt.NDArray, predicted: npt.NDArray, k: int) -> float:
   items in the ranking, giving higher weight to items appearing earlier.
 
   Args:
-      actual (npt.NDArray): A list of integers representing the ground truth relevant items.
-      predicted (npt.NDArray): A list of integers representing the predicted rankings of items.
+      actual (npt.NDArray[IntType]): A list of integers representing the ground truth relevant items.
+      predicted (npt.NDArray[IntType]): A list of integers representing the predicted rankings of items.
       k (int): The maximum number of top-ranked items to consider for evaluation.
 
   Returns:
@@ -174,15 +176,15 @@ def ndcg(actual: npt.NDArray, predicted: npt.NDArray, k: int) -> float:
   return dcg / idcg
 
 @njit(nogil=True, cache=True)
-def reciprocal_rank(actual: npt.NDArray, predicted: npt.NDArray, k: int) -> float:
+def reciprocal_rank(actual: npt.NDArray[IntType], predicted: npt.NDArray[IntType], k: int) -> float:
   """
   Computes the Reciprocal Rank (RR) at a specified rank `k`.
 
   Reciprocal Rank (RR) assigns a score based on the reciprocal of the rank at which the first relevant item is found.
 
   Args:
-      actual (npt.NDArray): A list of integers representing the ground truth relevant items.
-      predicted (npt.NDArray): A list of integers representing the predicted rankings of items.
+      actual (npt.NDArray[IntType]): A list of integers representing the ground truth relevant items.
+      predicted (npt.NDArray[IntType]): A list of integers representing the predicted rankings of items.
       k (int): The maximum number of top-ranked items to consider for evaluation.
 
   Returns:
@@ -205,16 +207,16 @@ def reciprocal_rank(actual: npt.NDArray, predicted: npt.NDArray, k: int) -> floa
   return float(0)
 
 @njit(nogil=True, cache=True)
-def mean_reciprocal_rank(actual_list: list[npt.NDArray], predicted_list: list[npt.NDArray], k: int) -> float:
+def mean_reciprocal_rank(actual_list: list[npt.NDArray[IntType]], predicted_list: list[npt.NDArray[IntType]], k: int) -> float:
   """
   Computes the Mean Reciprocal Rank (MRR) at a specified rank `k`.
 
   It calculates the mean of the Reciprocal Rank (RR) scores for a set of queries.
 
   Args:
-      actual_list (numba.typed.List[npt.NDArray]): A list of arrays where each inner list represents the 
+      actual_list (numba.typed.List[npt.NDArray[IntType]]): A list of arrays where each inner list represents the 
           ground truth relevant items for a query or task.
-      predicted_list (numba.typed.List[npt.NDArray]): A list of arrays where each inner list represents 
+      predicted_list (numba.typed.List[npt.NDArray[IntType]]): A list of arrays where each inner list represents 
           the predicted rankings of items for a query or task.
       k (int): The maximum number of top-ranked items to consider for each prediction.
 
