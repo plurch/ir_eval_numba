@@ -1,6 +1,6 @@
 [project]
-name = "ir-eval-numba"
-version = "0.1.0"
+name = "ir_eval_numba"
+version = "1.0.0"
 description = "Add your description here"
 readme = "README.md"
 authors = [
@@ -11,6 +11,22 @@ dependencies = [
     "numba>=0.60.0",
     "numpy>=2.0.2",
 ]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Natural Language :: English",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3"
+]
+keywords = ["Information retrieval", "Evaluation metrics", "Recommender systems", "Data science"]
+
+[project.urls]
+Homepage = "https://github.com/plurch/ir_eval_numba"
+Issues = "https://github.com/plurch/ir_eval_numba/issues"
 
 [build-system]
 requires = ["hatchling"]

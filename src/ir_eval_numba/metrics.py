@@ -127,9 +127,9 @@ def mean_average_precision(actual_list: list[npt.NDArray], predicted_list: list[
   queries.
 
   Args:
-      actual_list (list[npt.NDArray]): A list of lists where each inner list represents 
+      actual_list (numba.typed.List[npt.NDArray]): A list of arrays where each inner list represents 
           the ground truth relevant items for a query
-      predicted_list (list[npt.NDArray]): A list of lists where each inner list represents 
+      predicted_list (numba.typed.List[npt.NDArray]): A list of arrays where each inner list represents 
           the predicted rankings of items for a query
       k (int): The maximum number of top-ranked items to consider for each prediction.
 
@@ -212,9 +212,9 @@ def mean_reciprocal_rank(actual_list: list[npt.NDArray], predicted_list: list[np
   It calculates the mean of the Reciprocal Rank (RR) scores for a set of queries.
 
   Args:
-      actual_list (list[npt.NDArray]): A list of lists where each inner list represents the 
+      actual_list (numba.typed.List[npt.NDArray]): A list of arrays where each inner list represents the 
           ground truth relevant items for a query or task.
-      predicted_list (list[npt.NDArray]): A list of lists where each inner list represents 
+      predicted_list (numba.typed.List[npt.NDArray]): A list of arrays where each inner list represents 
           the predicted rankings of items for a query or task.
       k (int): The maximum number of top-ranked items to consider for each prediction.
 
