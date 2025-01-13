@@ -1,9 +1,11 @@
+import random
 import pytest
 import numpy as np
 from numba.typed import List
 from ir_eval_numba.metrics import (
     recall,
     precision,
+    f1_score,
     average_precision,
     mean_average_precision,
     ndcg,
@@ -26,6 +28,17 @@ class TestRecall:
   def test_is_numba_func(self):
     assert hasattr(recall, '__numba__')
 
+  def test_recall_zero(self):
+    result = recall(actual, np.array([5,6,7,9,10]), 5)
+    assert result == pytest.approx(0.0) # 0 out of 25
+
+  def test_recall_perfect(self):
+    actual_cloned_list = list(actual)
+    random.shuffle(actual_cloned_list) # does in place shuffle
+    actual_cloned = np.array(actual_cloned_list)
+    result = recall(actual, actual_cloned, len(actual))
+    assert result == pytest.approx(1.0) # 5 out of 5
+
   def test_recall_k_5(self):
     result = recall(actual, predicted, 5)
     assert result == pytest.approx(0.04) # 1 out of 25
@@ -38,6 +51,14 @@ class TestPrecision:
   def test_is_numba_func(self):
     assert hasattr(precision, '__numba__')
 
+  def test_precision_zero(self):
+    result = precision(actual, np.array([5,6,7,9,10]), 5)
+    assert result == pytest.approx(0.0) # 0 out of 25
+
+  def test_precision_k_5_perfect(self):
+    result = precision(actual, np.array([11, 58, 31, 8, 85]), 5)
+    assert result == pytest.approx(1.0) # 5 out of 5
+
   def test_precision_k_5(self):
     result = precision(actual, predicted, 5)
     assert result == pytest.approx(0.2) # 1 out of 5
@@ -45,6 +66,26 @@ class TestPrecision:
   def test_precision_k_10(self):
     result = precision(actual, predicted, 10)
     assert result == pytest.approx(0.3) # 3 out of 10
+
+class TestF1:
+  def test_is_numba_func(self):
+    assert hasattr(f1_score, '__numba__')
+
+  def test_f1_zero(self):
+    result = f1_score(actual, np.array([5,6,7,9,10]), 5)
+    assert result == pytest.approx(0.0)
+
+  def test_f1_perfect(self):
+    result = f1_score(np.array([8, 11, 31, 58, 85]), np.array([11, 58, 31, 8, 85]), 5)
+    assert result == pytest.approx(1.0)
+
+  def test_f1_k_5(self):
+    result = f1_score(actual, predicted, 5)
+    assert result == pytest.approx(0.06666666666666667) # precision: 0.2, recall: 0.04
+  
+  def test_f1_k_10(self):
+    result = f1_score(actual, predicted, 10)
+    assert result == pytest.approx(0.17142857142857143) # precision: 0.3, recall: 0.12
 
 class TestAveragePrecision:
   def test_is_numba_func(self):

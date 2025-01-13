@@ -15,7 +15,9 @@ If you don't need numba and want a library that is written in pure python, check
 ## Installation
 
 Requirements:
+
 Python 3.11 or 3.12
+
 numba>=0.60.0
 
 `ir_eval_numba` can be installed from pypi with:
@@ -48,6 +50,7 @@ uv run pytest
 ## Metrics
 - [Recall](#recall)
 - [Precision](#precision)
+- [F1 Score](#f1-score)
 - [Average Precision (AP)](#average-precision-ap)
 - [Mean Average Precision (MAP)](#mean-average-precision-map)
 - [Normalized Discounted Cumulative Gain (nDCG)](#normalized-discounted-cumulative-gain-ndcg)
@@ -73,6 +76,16 @@ Usage scenario: Minimize false positives in predictions. Later ranking stages sh
 
 ```
 from ir_eval_numba.metrics import precision
+```
+
+### F1 Score
+
+The F1-score is calculated as the harmonic mean of precision and recall. The F1-score provides a balanced view of a system's performance by taking into account both precision and recall.
+
+Usage scenario: Use when where finding all relevant documents is just as important as minimizing irrelevant ones (eg in information retrieval).
+
+```
+from ir_eval_numba.metrics import f1_score
 ```
 
 ### Average Precision (AP)
